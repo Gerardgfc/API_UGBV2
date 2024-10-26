@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory, render_template
 import os
 import joblib
+import pandas as pd
 from sklearn.preprocessing import StandardScaler
 import sys
 
