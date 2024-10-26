@@ -9,7 +9,7 @@ from io import StringIO
 app = Flask(__name__)
 
 # Ruta al archivo del modelo
-modelo_path = os.path.join(os.getcwd(), 'modelo_fraudev2.pkl')
+modelo_path = './modelo_fraudev2.pkl'
 
 # Cargar el modelo si existe
 if os.path.exists(modelo_path):
