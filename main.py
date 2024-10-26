@@ -60,6 +60,7 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
+    print("Recepción de solicitud a /predict")
     if 'file' not in request.files:
         return jsonify({'error': 'No hay parte de archivo en la solicitud'}), 400
     file = request.files['file']
