@@ -3,6 +3,8 @@ import joblib
 from sklearn.preprocessing import StandardScaler
 import sys
 
+app = Flask(__name__)
+
 # Ruta relativa del archivo del modelo
 modelo_path = './modelo_fraudev2.pkl'
 
