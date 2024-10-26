@@ -13,9 +13,11 @@ modelo_path = os.path.join(os.getcwd(), 'modelo_fraudev2.pkl')
 # Cargar el modelo si existe
 if os.path.exists(modelo_path):
     modelo = joblib.load(modelo_path)
+    print("Modelo cargado con éxito")
 else:
     print("Archivo de modelo no encontrado")
     sys.exit(1)
+
 
 # Inicializar el escalador
 escalador = StandardScaler()
@@ -85,7 +87,7 @@ def predict():
     output_file_name = f"resultado_{original_filename}.csv"
     output_file_path = os.path.join(output_folder, output_file_name)
 
-    resultados_df.to_csv(output_file_path, index=False)
+    #resultados_df.to_csv(output_file_path, index=False)
 
     return jsonify({'message': 'Predicciones guardadas en CSV', 'output_file': output_file_name})
 
@@ -94,4 +96,5 @@ def download_file(filename):
     return send_from_directory('resultados', filename, as_attachment=True)
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=os.getenv('PORT',default=5000))
+    app.run(host="0.0.0.0", port=os.getenv('PORT', default=5000))
+
