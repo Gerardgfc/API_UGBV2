@@ -1,22 +1,17 @@
-from flask import Flask, request, jsonify, send_file, render_template
-import joblib
-import pandas as pd
 import os
-import sys
+import joblib
 from sklearn.preprocessing import StandardScaler
-from io import StringIO
+import sys
 
-app = Flask(__name__)
-
-# Ruta al archivo del modelo
+# Ruta relativa del archivo del modelo
 modelo_path = './modelo_fraudev2.pkl'
 
 # Cargar el modelo si existe
 if os.path.exists(modelo_path):
     modelo = joblib.load(modelo_path)
-    print("Modelo cargado con éxito")
+    print("Modelo cargado exitosamente.")
 else:
-    print("Archivo de modelo no encontrado")
+    print("Archivo de modelo no encontrado.")
     sys.exit(1)
 
 # Inicializar el escalador
