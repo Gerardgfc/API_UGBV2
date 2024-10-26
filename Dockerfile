@@ -2,7 +2,7 @@
 FROM python:3.11
 
 # Establecer el directorio de trabajo
-WORKDIR /app
+WORKDIR /main
 
 # Copiar los archivos necesarios al contenedor
 COPY . .
