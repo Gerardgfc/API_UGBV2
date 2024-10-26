@@ -1,21 +1,20 @@
 from flask import Flask, request, jsonify, send_from_directory, render_template
-import os
 import joblib
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
+import os
 import sys
+from sklearn.preprocessing import StandardScaler
 
 app = Flask(__name__)
 
-# Ruta relativa del archivo del modelo
-modelo_path = './modelo_fraudev2.pkl'
+# Ruta al archivo del modelo
+modelo_path = os.path.join(os.getcwd(), 'modelo_fraudev2.pkl')
 
 # Cargar el modelo si existe
 if os.path.exists(modelo_path):
     modelo = joblib.load(modelo_path)
-    print("Modelo cargado exitosamente.")
 else:
-    print("Archivo de modelo no encontrado.")
+    print("Archivo de modelo no encontrado")
     sys.exit(1)
 
 # Inicializar el escalador
@@ -59,7 +58,6 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    print("Recepción de solicitud a /predict")
     if 'file' not in request.files:
         return jsonify({'error': 'No hay parte de archivo en la solicitud'}), 400
     file = request.files['file']
@@ -77,18 +75,23 @@ def predict():
 
     data_df_preprocesado = preprocesar_datos(data_df_preparado)
 
-    # Realizar la predicción
     prediccion = modelo.predict(data_df_preprocesado)
     resultados_df = pd.DataFrame(data={'predicciones': prediccion})
 
-    # Convertir el DataFrame a CSV en memoria
-    output = StringIO()
-    resultados_df.to_csv(output, index=False)
-    output.seek(0)
+    output_folder = 'resultados'
+    os.makedirs(output_folder, exist_ok=True)
 
-    # Devolver el archivo CSV como respuesta
-    return send_file(output, mimetype='text/csv', as_attachment=True, download_name='resultados_predicciones.csv')
+    original_filename = os.path.splitext(file.filename)[0]
+    output_file_name = f"resultado_{original_filename}.csv"
+    output_file_path = os.path.join(output_folder, output_file_name)
+
+    resultados_df.to_csv(output_file_path, index=False)
+
+    return jsonify({'message': 'Predicciones guardadas en CSV', 'output_file': output_file_name})
+
+@app.route('/download/<path:filename>', methods=['GET'])
+def download_file(filename):
+    return send_from_directory('resultados', filename, as_attachment=True)
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(debug=True, host="0.0.0.0", port=os.getenv('PORT',default=5000))
