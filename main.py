@@ -1,9 +1,10 @@
-from flask import Flask, request, jsonify, send_from_directory, render_template
+from flask import Flask, request, jsonify, send_file, render_template
 import joblib
 import pandas as pd
 import os
 import sys
 from sklearn.preprocessing import StandardScaler
+from io import StringIO
 
 app = Flask(__name__)
 
@@ -17,7 +18,6 @@ if os.path.exists(modelo_path):
 else:
     print("Archivo de modelo no encontrado")
     sys.exit(1)
-
 
 # Inicializar el escalador
 escalador = StandardScaler()
@@ -77,24 +77,17 @@ def predict():
 
     data_df_preprocesado = preprocesar_datos(data_df_preparado)
 
+    # Realizar la predicción
     prediccion = modelo.predict(data_df_preprocesado)
     resultados_df = pd.DataFrame(data={'predicciones': prediccion})
 
-    output_folder = 'resultados'
-    os.makedirs(output_folder, exist_ok=True)
+    # Convertir el DataFrame a CSV en memoria
+    output = StringIO()
+    resultados_df.to_csv(output, index=False)
+    output.seek(0)
 
-    original_filename = os.path.splitext(file.filename)[0]
-    output_file_name = f"resultado_{original_filename}.csv"
-    output_file_path = os.path.join(output_folder, output_file_name)
-
-    #resultados_df.to_csv(output_file_path, index=False)
-
-    return jsonify({'message': 'Predicciones guardadas en CSV', 'output_file': output_file_name})
-
-@app.route('/download/<path:filename>', methods=['GET'])
-def download_file(filename):
-    return send_from_directory('resultados', filename, as_attachment=True)
+    # Devolver el archivo CSV como respuesta
+    return send_file(output, mimetype='text/csv', as_attachment=True, download_name='resultados_predicciones.csv')
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=os.getenv('PORT', default=5000))
-
